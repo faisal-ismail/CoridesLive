@@ -47,28 +47,28 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAv2li3zQ4IeffLZ-0cjGdGsBvqxCYnamo',
-    appId: '1:970394434679:web:14c35d926acd9992849a72',
-    messagingSenderId: '970394434679',
-    projectId: 'corides-sineix',
-    authDomain: 'corides-sineix.firebaseapp.com',
-    storageBucket: 'corides-sineix.firebasestorage.app',
+    apiKey: 'YOUR_WEB_API_KEY_HERE',
+    appId: 'YOUR_WEB_APP_ID_HERE',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID_HERE',
+    projectId: 'YOUR_PROJECT_ID_HERE',
+    authDomain: 'YOUR_AUTH_DOMAIN_HERE',
+    storageBucket: 'YOUR_STORAGE_BUCKET_HERE',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDhip6G4d3Sx5irpHGQu3frE_r06xXElUY',
-    appId: '1:970394434679:android:71edb2d58492311d849a72',
-    messagingSenderId: '970394434679',
-    projectId: 'corides-sineix',
-    storageBucket: 'corides-sineix.firebasestorage.app',
+    apiKey: 'YOUR_ANDROID_API_KEY_HERE',
+    appId: 'YOUR_ANDROID_APP_ID_HERE',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID_HERE',
+    projectId: 'YOUR_PROJECT_ID_HERE',
+    storageBucket: 'YOUR_STORAGE_BUCKET_HERE',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA0YHOrqY8wv1Z8Wy7tKVLtOqZkVa2KbuE',
-    appId: '1:970394434679:ios:3f50bff88d5d9830849a72',
-    messagingSenderId: '970394434679',
-    projectId: 'corides-sineix',
-    storageBucket: 'corides-sineix.firebasestorage.app',
-    iosBundleId: 'com.sineix.corides',
+    apiKey: 'YOUR_IOS_API_KEY_HERE',
+    appId: 'YOUR_IOS_APP_ID_HERE',
+    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID_HERE',
+    projectId: 'YOUR_PROJECT_ID_HERE',
+    storageBucket: 'YOUR_STORAGE_BUCKET_HERE',
+    iosBundleId: 'YOUR_IOS_BUNDLE_ID_HERE',
   );
 }

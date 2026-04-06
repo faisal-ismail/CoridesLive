@@ -7,11 +7,13 @@ import 'package:flutter/material.dart';
 class MapService extends ChangeNotifier {
   GoogleMapController? _controller;
   Position? _currentPosition;
+  String? _currentAddress;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
 
   GoogleMapController? get controller => _controller;
   Position? get currentPosition => _currentPosition;
+  String? get currentAddress => _currentAddress;
   Set<Marker> get markers => _markers;
   Set<Polyline> get polylines => _polylines;
 
@@ -36,6 +38,12 @@ class MapService extends ChangeNotifier {
     if (permission == LocationPermission.deniedForever) return;
 
     _currentPosition = await Geolocator.getCurrentPosition();
+    
+    if (_currentPosition != null) {
+      _currentAddress = await getAddressFromLatLng(
+        LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+      );
+    }
     
     if (_controller != null && _currentPosition != null) {
       _controller!.animateCamera(

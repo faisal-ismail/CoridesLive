@@ -24,103 +24,163 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF9FAFB),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, border: Border.all(color: Colors.grey[200]!)),
+            child: const Icon(Icons.arrow_back_ios_new, color: Colors.black, size: 16),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 28.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
+              Icon(isOtpSent ? Icons.shield_rounded : Icons.phone_iphone_rounded, size: 64, color: const Color(0xFF15616D)),
+              const SizedBox(height: 24),
               Text(
-                isOtpSent ? "Verify OTP" : "Welcome to CoRides",
-                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.center,
+                isOtpSent ? "Verify Account" : "Access CoRides",
+                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: Color(0xFF001524), letterSpacing: -1),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Text(
-                isOtpSent
-                    ? "Enter the 6-digit code sent to your phone"
-                    : "Sign in with your phone number to continue",
+                isOtpSent ? "We've sent a 6-digit code to your phone" : "Enter your details to sign in and book your next smart ride",
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                style: TextStyle(color: Colors.grey[600], fontSize: 15, height: 1.5),
               ),
               const SizedBox(height: 48),
-              if (!isOtpSent) ...[
-                TextField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  style: const TextStyle(fontSize: 18),
-                  decoration: InputDecoration(
-                    hintText: "+92 300 1234567",
-                    prefixIcon: const Icon(Icons.phone),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
-                  ),
-                ),
-              ] else ...[
-                TextField(
-                  controller: _otpController,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 24, letterSpacing: 8),
-                  decoration: InputDecoration(
-                    hintText: "123456",
-                    prefixIcon: const Icon(Icons.lock_clock),
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 20),
-                  ),
-                ),
-              ],
-              const SizedBox(height: 32),
-              SizedBox(
-                height: 56,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    elevation: 2,
-                  ),
-                  onPressed: isLoading ? null : (isOtpSent ? _verifyOtp : _sendOtp),
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                        )
-                      : Text(
-                          isOtpSent ? "Verify & Proceed" : "Send OTP",
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                ),
+              
+              // Cross-fade for smoothness
+              AnimatedCrossFade(
+                duration: const Duration(milliseconds: 300),
+                firstChild: _buildPhoneInput(),
+                secondChild: _buildOtpInput(),
+                crossFadeState: isOtpSent ? CrossFadeState.showSecond : CrossFadeState.showFirst,
               ),
-              if (isOtpSent)
+              
+              const SizedBox(height: 40),
+              
+              // Primary Action
+              _buildActionButton(),
+              
+              if (isOtpSent) ...[
+                const SizedBox(height: 20),
                 TextButton(
                   onPressed: () => setState(() => isOtpSent = false),
-                  child: const Text("Use a different number"),
+                  child: const Text("Use different number", style: TextStyle(color: Color(0xFF15616D), fontWeight: FontWeight.bold)),
                 ),
+              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  // --- Styled Helpers (Mirroring LoginSheet) ---
+
+  Widget _buildPhoneInput() {
+    return _buildTextField(
+      controller: _phoneController,
+      hint: "+92 300 1234567",
+      icon: Icons.phone_iphone_rounded,
+      label: "Phone Number",
+      keyboardType: TextInputType.phone,
+    );
+  }
+
+  Widget _buildOtpInput() {
+    return _buildTextField(
+      controller: _otpController,
+      hint: "------",
+      icon: Icons.shield_rounded,
+      label: "OTP Code",
+      keyboardType: TextInputType.number,
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required String label,
+    required TextInputType keyboardType,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            label.toUpperCase(),
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Color(0xFF15616D)),
+          ),
+        ),
+        TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 1),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(color: Colors.grey[400], letterSpacing: 2),
+            prefixIcon: Icon(icon, color: const Color(0xFF15616D), size: 22),
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: Colors.grey[200]!, width: 1.5),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: Color(0xFF15616D), width: 2),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton() {
+    return Container(
+      width: double.infinity,
+      height: 62,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF15616D), Color(0xFF001524)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF15616D).withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          )
+        ],
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        ),
+        onPressed: isLoading ? null : (isOtpSent ? _verifyOtp : _sendOtp),
+        child: isLoading
+            ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+            : Text(
+                isOtpSent ? "CONFIRM & VERIFY" : "PROCEED SECURELY",
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 2, fontSize: 14),
+              ),
       ),
     );
   }

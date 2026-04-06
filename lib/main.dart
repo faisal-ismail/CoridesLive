@@ -15,6 +15,7 @@ import 'package:corides/screens/login_screen.dart';
 import 'package:corides/screens/add_vehicle_screen.dart';
 import 'package:corides/screens/my_vehicles_screen.dart';
 import 'package:corides/screens/gemini_chat_screen.dart';
+import 'package:corides/screens/live_gemini_coride.dart';
 import 'package:corides/constants.dart';
 
 void main() async {
@@ -214,11 +215,14 @@ class _CoRidesHomeState extends State<CoRidesHome> {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Stats Card
           Consumer2<AuthService, FirestoreService>(
             builder: (context, auth, firestore, _) {
-              if (!auth.isAuthenticated) return const SizedBox.shrink();
+              if (!auth.isAuthenticated) {
+                return _buildLoginPrompt();
+              }
 
               return FutureBuilder<UserModel?>(
                 future: firestore.getUser(auth.user!.uid),
@@ -227,7 +231,7 @@ class _CoRidesHomeState extends State<CoRidesHome> {
                   if (user == null) return const SizedBox.shrink();
 
                   return Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
                         colors: [Color(0xFF4285F4), Color(0xFF9171E5)],
@@ -238,6 +242,7 @@ class _CoRidesHomeState extends State<CoRidesHome> {
                       boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
                     ),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -269,7 +274,7 @@ class _CoRidesHomeState extends State<CoRidesHome> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -278,9 +283,9 @@ class _CoRidesHomeState extends State<CoRidesHome> {
                             _statItem(Icons.account_balance_wallet, "\$${user.walletBalance.toStringAsFixed(0)}", "Wallet"),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
                         Divider(color: Colors.white.withValues(alpha: 0.3), thickness: 1),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -296,6 +301,10 @@ class _CoRidesHomeState extends State<CoRidesHome> {
                               scale: 0.8,
                               child: Switch(
                                 value: isDriverMode,
+                                activeColor: Colors.white,
+                                activeTrackColor: Colors.white.withValues(alpha: 0.3),
+                                inactiveThumbColor: Colors.white,
+                                inactiveTrackColor: Colors.white.withValues(alpha: 0.1),
                                 onChanged: (value) async {
                                   if (value) {
                                     await _handleDriverSwitch();
@@ -303,10 +312,6 @@ class _CoRidesHomeState extends State<CoRidesHome> {
                                     setState(() => isDriverMode = false);
                                   }
                                 },
-                                activeThumbColor: Colors.white,
-                                activeTrackColor: Colors.white.withValues(alpha: 0.3),
-                                inactiveThumbColor: Colors.white,
-                                inactiveTrackColor: Colors.white.withValues(alpha: 0.3),
                               ),
                             ),
                             Text(
@@ -326,6 +331,8 @@ class _CoRidesHomeState extends State<CoRidesHome> {
               );
             },
           ),
+          const SizedBox(height: 16),
+          _buildAIAssistantCard(),
           const SizedBox(height: 24),
           _buildInteractionPanel(),
           const SizedBox(height: 24),
@@ -392,10 +399,9 @@ class _CoRidesHomeState extends State<CoRidesHome> {
   Widget _statItem(IconData icon, String value, String label) {
     return Column(
       children: [
-        Icon(icon, color: Colors.white, size: 30),
-        const SizedBox(height: 6),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
-        Text(label, style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 13)),
+        Icon(icon, color: Colors.white, size: 22),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
       ],
     );
   }
@@ -753,6 +759,24 @@ class _CoRidesHomeState extends State<CoRidesHome> {
                     subtitle: Text("\$${user?.walletBalance ?? 0.0}"),
                     onTap: () {},
                   ),
+                  ListTile(
+                    leading: const Icon(Icons.drive_eta, color: Colors.blueAccent),
+                    title: const Text("Gemini CoRide"),
+                    subtitle: const Text("Voice Ride Assistant"),
+                    onTap: () {
+                      Navigator.pop(context);
+                      final mapService = context.read<MapService>();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LiveGeminiCorideScreen(
+                            isDriverMode: isDriverMode,
+                            currentLocationAddress: mapService.currentAddress,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                   const Spacer(),
                   ListTile(
                     leading: const Icon(Icons.logout, color: Colors.red),
@@ -889,6 +913,99 @@ class _CoRidesHomeState extends State<CoRidesHome> {
 
   void _showLoginScreen() {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+  }
+
+  Widget _buildLoginPrompt() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 20, offset: Offset(0, 10))],
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.account_circle_outlined, size: 60, color: Colors.blueAccent),
+          const SizedBox(height: 16),
+          const Text("Ready to Ride?", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          const Text("Sign in to unlock Gemini AI assistant and start sharing your journey.", 
+               textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: _showLoginScreen,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blueAccent, foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            ),
+            child: const Text("SIGN IN NOW"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAIAssistantCard() {
+    return GestureDetector(
+      onTap: () {
+        final auth = context.read<AuthService>();
+        if (!auth.isAuthenticated) {
+           _showLoginScreen();
+           return;
+        }
+        final mapService = context.read<MapService>();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LiveGeminiCorideScreen(
+              isDriverMode: isDriverMode,
+              currentLocationAddress: mapService.currentAddress,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(25),
+          gradient: const LinearGradient(
+            colors: [Color(0xFF4285F4), Color(0xFF9171E5)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(color: const Color(0xFF4285F4).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 8)),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: ClipOval(
+                child: Image.asset('assets/images/bot-ai.png', height: 40, width: 40, fit: BoxFit.cover),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Live CoRide Voice Assistant", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                  const SizedBox(height: 2),
+                  Text("Voice-first ride booking assistant", style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 12)),
+                ],
+              ),
+            ),
+            const Icon(Icons.arrow_forward_ios, color: Colors.white54, size: 14),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showGeminiChatScreen() async {

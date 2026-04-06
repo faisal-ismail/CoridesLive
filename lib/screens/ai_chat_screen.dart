@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:corides/screens/gemini_live_screen.dart';
+import 'package:corides/screens/live_gemini_coride.dart';
+import 'package:corides/services/map_service.dart';
 import 'package:corides/services/auth_service.dart';
 import 'package:corides/services/firestore_service.dart';
 import 'package:corides/services/gemini_service.dart';
@@ -102,10 +103,14 @@ class _AIChatScreenState extends State<AIChatScreen> with SingleTickerProviderSt
           IconButton(
             icon: const Icon(Icons.mic, color: Colors.blue),
             onPressed: () {
+              final mapService = context.read<MapService>();
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => GeminiLiveScreen(isDriverMode: widget.isDriverMode),
+                  builder: (context) => LiveGeminiCorideScreen(
+                    isDriverMode: widget.isDriverMode,
+                    currentLocationAddress: mapService.currentAddress,
+                  ),
                 ),
               );
             },
