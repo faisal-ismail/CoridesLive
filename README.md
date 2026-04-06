@@ -121,7 +121,7 @@ We aim to integrate real-time payment gateways directly into the voice flow and 
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/faisal-ismail/corides.git
+   git clone https://github.com/faisal-ismail/CoridesLive.git
    cd corides
    ```
 
