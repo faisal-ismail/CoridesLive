@@ -353,7 +353,7 @@ This is a public open-source project. Contributions are welcome! Please feel fre
 
 ## 👨‍💻 Developer
 
-Developed with ❤️ using Flutter and powered by Google Gemini AI
+Developed by [Faisal Ismail](https://www.linkedin.com/in/faisalismail-pk/) with ❤️ using Flutter and powered by Google Gemini AI
 
 ---
 
