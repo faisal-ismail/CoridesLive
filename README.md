@@ -1,4 +1,4 @@
-# 🚗 CoRides.ai — AI-Powered Community Mobility Platform
+# 🚗 CoRides.ai — AI-Powered Community Mobility Platform Built for #AISeekho 2026 - Challenge Submission
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.10+-02569B?logo=flutter)](https://flutter.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Enabled-FFCA28?logo=firebase)](https://firebase.google.com)
